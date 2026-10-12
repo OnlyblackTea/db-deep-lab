@@ -10,13 +10,6 @@
 > [`docs/设计规格.md`](docs/设计规格.md)，落地清单见
 > [`docs/骨架落地清单.md`](docs/骨架落地清单.md)。
 
-> [!WARNING]
-> **本规格尚未按题库侧的 `_SCALE.md` 复核规模。** 现有 stage 的改动面普遍只有 1~2 个文件、
-> canonical 只有 3~4 条，低于现行下限（改动面 **≥3 文件**、canonical **≥5 条**且红 ≥2 条不同不变量、
-> 含边界/拒绝路径）。**开工前必须先复核并扩编**（同 stage 扩面，或与相邻 stage 合并），
-> 并把结果写回规格与 ticket 卡。参考已复核的两份：`mq-lab`（6 stage 全部扩面）
-> 与 `concurrency-lab`（Stage 1 / Stage 2）。
-
 
 ## 这是什么
 
@@ -28,10 +21,10 @@
 | 语言栈 | Java 17 + Maven + JUnit 5（surefire `-Dgroups=stageNN`）+ Spring Boot 3（JdbcTemplate 直连，不用 ORM 生成 SQL） |
 | 基础设施 | docker compose 起 **4 个 MySQL 8.0 实例**：`dbdeep-master`@13307、`dbdeep-replica`@13308（异步复制）、`dbdeep-shard`@13309（内含 `shard_0`/`shard_1` 两个逻辑库）、`dbdeep-restore`@13310（PITR 恢复靶机）。无 Redis、无公网、无外部服务 |
 | stage 数 | 6 个（+ `stage-00-onboarding` 只上板、不出 ticket，见 §3） |
-| 每 stage 规模 | （见规格） |
+| 每 stage 规模 | 按 [`_SCALE.md`](./_SCALE.md) 的下限复核后（本轮「v1.1 规模复核」，见 §1）：6 个 stage **全部选择「同 stage 扩面」、零合并**，改动面合计 **13 → 23 个文件位置**；canonical **20 → 40 条**（红 16 · 单线程基线 14 · 边界/拒绝 10），被破坏的不变量 **16 个**（= 红用例数、**两两不同不变量**）；考点族每个 stage ≥ 2。逐 stage 分布见 §1 的 v1.1 复核块 |
 | 依赖前置 | `requires: {java: "17", build: maven, docker: "24"}`；另需 ≥6GB 可用内存、13307–13310 空闲 |
 | 与 database-bagu 的关系 | **续集**：`seckill-lab` 的地图末尾那节「本项目不涉及、但你该文字了解」列的四个考点（分库分表 / 主从复制 / binlog 三格式 / 两阶段提交）正是本 Track 的正题。零重叠：本 Track 不复讲索引、ACID、锁、隔离级别、缓存，也不重搭 Redis |
-| 预计落地工作量 | 骨架 8 人日 / canonical 测试 9 人日 / 题面与判据 4 人日 / 分支与 pin 2 人日 |
+| 预计落地工作量 | 骨架 12 人日 / canonical 测试 14 人日 / 题面与判据 5 人日 / 分支与 pin 2.5 人日（**合计 33.5 人日**；旧口径 23 人日是「每 stage 1~3 文件 / 3~4 用例」的估算，已按 §7 的 v1.1 重新估算块上修） |
 
 ## stage 一览
 
